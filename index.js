@@ -11,14 +11,14 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Routes
-app.use('/api/v1/users', userRoutes);
-
 // MongoDB connection
-const mongoURI = 'your_mongodb_connection_string';
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+const mongoURI = 'mongodb://localhost:27017/messManagementSystem';
+mongoose.connect(mongoURI)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err));
+
+// routes
+app.use('/user', userRoutes)
 
 // Start server
 app.listen(PORT, () => {
