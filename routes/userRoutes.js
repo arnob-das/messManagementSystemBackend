@@ -11,4 +11,7 @@ router.get('/', userController.getAllUsers);
 // Login user
 router.post('/login', userController.loginUser);
 
+// Update a user by ID
+router.put('/update/:id', userController.updateUserById);
+
 module.exports = router;

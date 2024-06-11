@@ -70,3 +70,26 @@ exports.loginUser = async (req, res) => {
         res.status(500).json({ message: 'Server error from server' });
     }
 };
+
+// update user by id after creating a mess
+// user become a manager
+exports.updateUserById = async (req, res) => {
+    const { id } = req.params;
+    const { approved, currentMessId, role } = req.body;
+
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { approved, currentMessId, role },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({updatedUser, message:"Update user successfully !"});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
