@@ -6,4 +6,6 @@ const messController = require('../controllers/MessController');
 // Create a mess
 router.post('/create', messController.createMess);
 
+router.get('/:id', messController.getMessById);
+
 module.exports = router;
