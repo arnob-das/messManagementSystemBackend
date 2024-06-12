@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const messRoutes = require('./routes/messRoutes');
+const mealCountRoutes = require('./routes/mealCountRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -21,6 +22,7 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
 // routes
 app.use('/user', userRoutes)
 app.use('/mess', messRoutes)
+app.use('/mealCount', mealCountRoutes)
 
 // Start server
 app.listen(PORT, () => {
