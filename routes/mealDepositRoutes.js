@@ -7,5 +7,6 @@ router.put('/updateMealDeposit', mealDepositController.updateMealDeposit);
 router.delete('/deleteMealDeposit', mealDepositController.deleteMealDeposit);
 router.get('/getMessMealDeposits', mealDepositController.getMessMealDeposits);
 router.get('/getUserMealDeposits', mealDepositController.getUserMealDeposits);
+router.put('/updateMealDepositStatus', mealDepositController.updateMealDepositStatus);
 
 module.exports = router;

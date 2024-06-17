@@ -1,7 +1,7 @@
 const MealDeposit = require('../models/MealDepositModel');
 
 exports.addMealDeposit = async (req, res) => {
-    const { currentMessId, date, depositAmount, userId } = req.body;
+    const { currentMessId, date, depositAmount, userId, userFullName } = req.body;
 
     const depositDate = new Date(date);
     const month = depositDate.getMonth() + 1; // Extract month (0-indexed)
@@ -13,7 +13,7 @@ exports.addMealDeposit = async (req, res) => {
         if (!mealDeposit) {
             mealDeposit = new MealDeposit({ currentMessId, month, year, deposits: [] });
         }
-        mealDeposit.deposits.push({ userId, depositDate, depositAmount });
+        mealDeposit.deposits.push({ userId, depositDate, depositAmount, userFullName, status: "pending" });
 
         await mealDeposit.save();
 
@@ -26,6 +26,8 @@ exports.addMealDeposit = async (req, res) => {
 
 exports.updateMealDeposit = async (req, res) => {
     const { depositId, depositAmount } = req.body;
+
+    console.log(depositId, depositAmount);
 
     try {
         const mealDeposit = await MealDeposit.findOne({ 'deposits._id': depositId });
@@ -45,6 +47,29 @@ exports.updateMealDeposit = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.updateMealDepositStatus = async (req, res) => {
+    const { depositId, status } = req.body;
+
+    try {
+        const mealDeposit = await MealDeposit.findOne({ 'deposits._id': depositId });
+
+        if (!mealDeposit) {
+            return res.status(404).json({ message: 'Deposit not found' });
+        }
+        const deposit = mealDeposit.deposits.id(depositId);
+
+        deposit.status = status;
+
+        await mealDeposit.save();
+
+        res.status(200).json({ mealDeposit, message: 'Deposit status updated successfully' });
+    } catch (error) {
+        console.error('Error updating meal deposit status', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 
 exports.deleteMealDeposit = async (req, res) => {
     const { depositId } = req.body;
@@ -76,7 +101,9 @@ exports.getMessMealDeposits = async (req, res) => {
     const year = depositDate.getFullYear();
 
     try {
-        const mealDeposits = await MealDeposit.findOne({ currentMessId, month, year }).populate('deposits.userId', 'name email');
+        const mealDeposits = await MealDeposit.findOne({
+            currentMessId, month, year
+        })
 
         if (!mealDeposits) {
             return res.status(404).json({ message: 'No deposits found for the specified criteria' });
@@ -91,6 +118,8 @@ exports.getMessMealDeposits = async (req, res) => {
 exports.getUserMealDeposits = async (req, res) => {
     const { currentMessId, date, userId } = req.query;
 
+    console.log(currentMessId, date, userId);
+
     const depositDate = new Date(date);
     const month = depositDate.getMonth() + 1;
     const year = depositDate.getFullYear();
@@ -101,14 +130,13 @@ exports.getUserMealDeposits = async (req, res) => {
             month,
             year,
             'deposits.userId': userId
-        }).populate('deposits.userId', 'name email');
+        }).populate('deposits.userId', 'fullName email');
 
         if (!mealDeposits) {
             return res.status(404).json({ message: 'No deposits found for the specified criteria' });
         }
 
         const userDeposits = mealDeposits.deposits.filter(deposit => deposit.userId._id.toString() === userId);
-
         res.status(200).json(userDeposits);
     } catch (error) {
         console.error('Error fetching user meal deposits', error);
