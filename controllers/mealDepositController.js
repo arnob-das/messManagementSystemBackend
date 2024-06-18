@@ -27,8 +27,6 @@ exports.addMealDeposit = async (req, res) => {
 exports.updateMealDeposit = async (req, res) => {
     const { depositId, depositAmount } = req.body;
 
-    console.log(depositId, depositAmount);
-
     try {
         const mealDeposit = await MealDeposit.findOne({ 'deposits._id': depositId });
 
@@ -117,9 +115,7 @@ exports.getMessMealDeposits = async (req, res) => {
 
 exports.getUserMealDeposits = async (req, res) => {
     const { currentMessId, date, userId } = req.query;
-
-    console.log(currentMessId, date, userId);
-
+    
     const depositDate = new Date(date);
     const month = depositDate.getMonth() + 1;
     const year = depositDate.getFullYear();

@@ -87,8 +87,7 @@ exports.editMeal = async (req, res) => {
 
 exports.deleteMeal = async (req, res) => {
     const { mealId } = req.body;
-    console.log(mealId);
-
+    
     try {
         let mealCount = await MealCountModel.findOne({ 'meals._id': mealId });
 

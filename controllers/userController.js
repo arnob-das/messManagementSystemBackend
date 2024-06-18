@@ -47,6 +47,24 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
+exports.getUserById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const user = await User.findById(id, { _id: 0, fullName: 1 });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({ user });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
 // Login user
 exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
@@ -88,7 +106,7 @@ exports.updateUserById = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({updatedUser, message:"Update user successfully !"});
+        res.status(200).json({ updatedUser, message: "User updated successfully !" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

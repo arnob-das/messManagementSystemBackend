@@ -10,7 +10,7 @@ const messSchema = new mongoose.Schema({
     members: [{
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         joinDate: Date,
-        seatRent: { type: Number, default: 0 }
+        seatRent: { type: Number, default: 0 },
     }]
 });
 
