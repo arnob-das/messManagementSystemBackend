@@ -10,7 +10,12 @@ router.get('/:id', messController.getMessById);
 
 router.post('/addMemberToMess',messController.addMemberToMess);
 
-// get upapproved users of a mess after joining a mess
 router.get('/getUnapprovedMembers/:messId',messController.getUnapprovedMembers);
+router.get('/getApprovedMembers/:messId',messController.getApprovedMembers);
+
+router.post('/setSeatRent', messController.setSeatRentForMember);
+router.get('/getSeatRentForUser', messController.getSeatRentForMember);
+router.get('/getApprovedMembersSeatRents/:messId', messController.getApprovedMembersSeatRents);
+router.put('/updateSeatRentForUser', messController.updateSeatRentForMember);
 
 module.exports = router;
