@@ -84,7 +84,7 @@ exports.getUnapprovedMembers = async (req, res) => {
             role: user.role,
             currentMessId: user.currentMessId
         }));
-
+        
         res.json(unapprovedMembers);
     } catch (err) {
         console.error(err);
