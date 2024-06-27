@@ -7,6 +7,7 @@ const messRoutes = require('./routes/messRoutes');
 const mealCountRoutes = require('./routes/mealCountRoutes');
 const mealDepositRoutes = require('./routes/mealDepositRoutes');
 const utilityBillRoutes = require('./routes/utilityBillRoutes');
+const groceryCostRoutes = require('./routes/groceryCostRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -27,6 +28,7 @@ app.use('/mess', messRoutes);
 app.use('/mealCount', mealCountRoutes);
 app.use('/mealDeposit', mealDepositRoutes);
 app.use('/utilityBill', utilityBillRoutes);
+app.use('/groceryCost', groceryCostRoutes);
 
 // Start server
 app.listen(PORT, () => {

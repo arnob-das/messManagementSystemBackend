@@ -61,42 +61,6 @@ exports.getMeals = async (req, res) => {
     }
 };
 
-// exports.getAllMessMembersMeals = async (req, res) => {
-//     const { currentMessId, month, year } = req.params;
-
-//     try {
-//         const mealCounts = await MealCountModel.findOne({
-//             currentMessId,
-//             month,
-//             year,
-//         });
-
-//         if (!mealCounts) {
-//             return res.status(404).json({ message: 'No meal data found for the specified mess, month, and year' });
-//         }
-
-//         // Group meals by userId
-//         const mealsByUser = mealCounts.meals.reduce((acc, meal) => {
-//             if (!acc[meal.userId]) {
-//                 acc[meal.userId] = [];
-//             }
-//             acc[meal.userId].push(meal);
-//             return acc;
-//         }, {});
-
-//         // Transform the grouped data into an array of objects
-//         const groupedMeals = Object.keys(mealsByUser).map(userId => ({
-//             userId,
-//             meals: mealsByUser[userId]
-//         }));
-
-//         res.status(200).json(groupedMeals);
-//     } catch (error) {
-//         console.error('Error fetching meals:', error);
-//         res.status(500).json({ message: error.message });
-//     }
-// };
-
 exports.getAllMessMembersMeals = async (req, res) => {
     const { currentMessId, month, year } = req.params;
 
