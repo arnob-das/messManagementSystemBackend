@@ -126,7 +126,7 @@ exports.getApprovedMembersSeatRents = async (req, res) => {
         const approvedMembersSeatRents = approvedMembers.map(member => ({
             fullName: member.userId.fullName,
             seatRent: member.seatRent,
-            userId:member.userId._id
+            userId: member.userId._id
         }));
 
         res.status(200).json(approvedMembersSeatRents);
@@ -217,9 +217,72 @@ exports.updateSeatRentForMember = async (req, res) => {
         }
         member.seatRent = seatRent;
         await mess.save();
-        res.status(200).json({mess, message: "Seat rent updated for the member" });
+        res.status(200).json({ mess, message: "Seat rent updated for the member" });
     } catch (error) {
         console.error('Failed to update seat rent for the member:', error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+// Update user role
+exports.updateUserRole = async (req, res) => {
+    const { messId, userId, role } = req.body;
+
+    try {
+        // Find the mess
+        const mess = await Mess.findById(messId);
+        if (!mess) {
+            return res.status(404).json({ message: "Mess not found" });
+        }
+
+        // Find the user in the mess members
+        const member = mess.members.find(member => member.userId.toString() === userId);
+        if (!member) {
+            return res.status(404).json({ message: "User is not a member of this mess" });
+        }
+
+        // Update the user's role
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        user.role = role;
+        await user.save();
+
+        res.status(200).json({ success: true, message: `Role updated to ${role} for ${user.fullName}` });
+    } catch (error) {
+        console.error('Failed to update user role:', error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+exports.leaveMess = async (req, res) => {
+    try {
+        const { messId, userId } = req.body;
+
+        // Find the mess by ID and remove the user from the members array
+        const mess = await Mess.findById(messId);
+        if (!mess) {
+            return res.status(404).json({ message: "Mess not found" });
+        }
+
+        // Remove the member from the mess
+        mess.members = mess.members.filter(member => member.userId.toString() !== userId);
+        await mess.save();
+
+        // Update the user's document
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        user.approved = false;
+        user.role = 'user';
+        user.currentMessId = null;
+        await user.save();
+
+        res.status(200).json({ message: "User has left the mess successfully" });
+    } catch (error) {
+        console.error('Error while leaving the mess:', error);
         res.status(500).json({ message: "Internal server error" });
     }
 };

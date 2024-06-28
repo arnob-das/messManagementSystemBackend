@@ -21,4 +21,7 @@ router.put('/updateSeatRentForUser', messController.updateSeatRentForMember);
 
 router.get('/getTotalSeatRentForApprovedUsers/:messId', messController.getTotalSeatRentForApprovedUsers);
 
+router.put('/updateUserRole',messController.updateUserRole)
+router.put('/leave',messController.leaveMess)
+
 module.exports = router;
