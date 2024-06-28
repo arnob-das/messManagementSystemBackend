@@ -88,3 +88,44 @@ exports.getGroceryCost = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.getTotalGroceryCost = async (req, res) => {
+    const { messId, month, year } = req.params;
+
+    try {
+        const groceryCost = await GroceryCost.findOne({ messId, month, year });
+
+        if (!groceryCost) {
+            return res.status(404).json({ message: 'No grocery cost data found for the specified mess, month, and year' });
+        }
+
+        const totalCost = groceryCost.groceries.reduce((sum, grocery) => sum + grocery.price, 0);
+
+        res.status(200).json({ totalCost, message: 'Total grocery cost calculated successfully' });
+    } catch (error) {
+        console.error('Error calculating total grocery cost:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getTotalGroceryCostByUser = async (req, res) => {
+    const { messId, month, year, userId } = req.params;
+
+    try {
+        const groceryCost = await GroceryCost.findOne({ messId, month, year });
+
+        if (!groceryCost) {
+            return res.status(404).json({ message: 'No grocery cost data found for the specified mess, month, and year' });
+        }
+
+        const totalCost = groceryCost.groceries
+            .filter(grocery => grocery.userId.toString() === userId)
+            .reduce((sum, grocery) => sum + grocery.price, 0);
+
+        res.status(200).json({ totalCost, message: 'Total grocery cost for user calculated successfully' });
+    } catch (error) {
+        console.error('Error calculating total grocery cost for user:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+

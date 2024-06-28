@@ -158,10 +158,9 @@ exports.setSeatRentForMember = async (req, res) => {
     }
 };
 
-// Additional methods for managing seat rent of approved members
 
-// Get seat rent for an approved member
-exports.getSeatRentForMember = async (req, res) => {
+// Get seat rent for single member
+exports.getSeatRentForSingleMember = async (req, res) => {
     const { messId, userId } = req.params;
 
     try {
@@ -177,6 +176,29 @@ exports.getSeatRentForMember = async (req, res) => {
     } catch (error) {
         console.error('Failed to get seat rent for the member:', error);
         res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+exports.getTotalSeatRentForApprovedUsers = async (req, res) => {
+    const { messId } = req.params;
+
+    try {
+        const mess = await Mess.findById(messId).populate('members.userId');
+
+        if (!mess) {
+            return res.status(404).json({ message: 'Mess not found' });
+        }
+
+        const approvedMembers = mess.members.filter(member => member.userId.approved);
+
+        const totalSeatRent = approvedMembers.reduce((total, member) => {
+            return total + (member.seatRent || 0);
+        }, 0);
+
+        res.status(200).json({ messId, totalSeatRent });
+    } catch (error) {
+        console.error('Failed to fetch total seat rent for approved users:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 

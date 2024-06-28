@@ -1,4 +1,3 @@
-// routes/messRoutes.js
 const express = require('express');
 const router = express.Router();
 const messController = require('../controllers/MessController');
@@ -14,8 +13,12 @@ router.get('/getUnapprovedMembers/:messId',messController.getUnapprovedMembers);
 router.get('/getApprovedMembers/:messId',messController.getApprovedMembers);
 
 router.post('/setSeatRent', messController.setSeatRentForMember);
-router.get('/getSeatRentForUser', messController.getSeatRentForMember);
+
+router.get('/getSeatRentForSingleMember/:messId/:userId', messController.getSeatRentForSingleMember);
+
 router.get('/getApprovedMembersSeatRents/:messId', messController.getApprovedMembersSeatRents);
 router.put('/updateSeatRentForUser', messController.updateSeatRentForMember);
+
+router.get('/getTotalSeatRentForApprovedUsers/:messId', messController.getTotalSeatRentForApprovedUsers);
 
 module.exports = router;

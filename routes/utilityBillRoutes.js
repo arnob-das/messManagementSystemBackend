@@ -14,4 +14,7 @@ router.put('/update', utilityBillController.updateUtility);
 // Delete a utility bill
 router.delete('/delete', utilityBillController.deleteUtility);
 
+// get total utility bill cost
+router.get('/getTotalUtilityBill/:messId/:month/:year', utilityBillController.getTotalUtilityCost);
+
 module.exports = router;

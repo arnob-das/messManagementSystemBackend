@@ -114,3 +114,27 @@ exports.deleteUtility = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.getTotalUtilityCost = async (req, res) => {
+    try {
+        const { messId, month, year } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(messId)) {
+            return res.status(400).json({ message: 'Invalid messId format' });
+        }
+
+        const utilityBill = await UtilityBill.findOne({ messId, month, year });
+
+        if (!utilityBill) {
+            return res.status(404).json({ message: 'Utility bill not found' });
+        }
+
+        const totalUtilityCost = utilityBill.utilities.reduce((total, utility) => {
+            return total + utility.utilityCost;
+        }, 0);
+
+        res.json({ messId, month, year, totalUtilityCost });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

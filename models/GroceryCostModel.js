@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const grocerySchema = new Schema({
+    userId: { type: Schema.Types.ObjectId, required: true },
     groceryDetails: { type: String, required: true },
     price: { type: Number, required: true },
     date:{type:Date,required:true}

@@ -1,0 +1,33 @@
+get seat rent for single users(done)
+/messId/userId
+http://localhost:5000/mess/getSeatRentForSingleMember/6668c2869719e15b445e2419/6668c2619719e15b445e2416
+
+get seat rent for all approved users
+/getTotalSeatRentForApprovedUsers/messId
+localhost:5000/mess/getTotalSeatRentForApprovedUsers/6668c2869719e15b445e2419
+
+
+
+get total grocery cost for a mess of a month and year
+/messId/month/year
+http://localhost:5000/groceryCost/getTotalGroceryCostForMess/6668c2869719e15b445e2419/6/2024
+
+get total grocery cost by a user for a mess, month and year
+/messId/month/year/userId
+http://localhost:5000/groceryCost/getTotalGroceryCostByUser/6668c2869719e15b445e2419/6/2024/6668c2619719e15b445e2416
+
+
+
+get total mealCount for a mess of a month and year(done)
+/messId/month/year
+http://localhost:5000/mealCount/getTotalMealCountForMess/6668c2869719e15b445e2419/6/2024
+
+get total mealcount for a user of a mess, month and year
+/messId/month/year/userId
+http://localhost:5000/mealCount/getTotalMealCountForUser/6668c2869719e15b445e2419/6/2024/6668c2619719e15b445e2416
+
+
+
+get total utility bill for a mess of a month and year
+/messId/month/year
+http://localhost:5000/utilityBill/getTotalUtilityBill/6668c2869719e15b445e2419/6/2024

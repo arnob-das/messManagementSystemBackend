@@ -130,7 +130,7 @@ exports.editMeal = async (req, res) => {
 
 exports.deleteMeal = async (req, res) => {
     const { mealId } = req.body;
-    
+
     try {
         let mealCount = await MealCountModel.findOne({ 'meals._id': mealId });
 
@@ -149,6 +149,54 @@ exports.deleteMeal = async (req, res) => {
         }
     } catch (error) {
         console.error('Error deleting meal:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getTotalMealCountForMess = async (req, res) => {
+    const { messId, month, year } = req.params;
+
+    try {
+        const mealCount = await MealCountModel.findOne({ currentMessId: messId, month, year });
+
+        if (!mealCount) {
+            return res.status(404).json({ message: 'No meal data found for the specified mess, month, and year' });
+        }
+
+        const totalMeals = mealCount.meals.reduce((total, meal) => {
+            return total + meal.breakfast + meal.lunch + meal.dinner;
+        }, 0);
+
+        res.status(200).json({ messId, month, year, totalMeals });
+    } catch (error) {
+        console.error('Error fetching total meal count:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getTotalMealCountForUser = async (req, res) => {
+    const { messId, month, year, userId } = req.params;
+
+    try {
+        const mealCount = await MealCountModel.findOne({ currentMessId: messId, month, year });
+
+        if (!mealCount) {
+            return res.status(404).json({ message: 'No meal data found for the specified mess, month, and year' });
+        }
+
+        const userMeals = mealCount.meals.filter(meal => meal.userId.equals(userId));
+
+        if (userMeals.length === 0) {
+            return res.status(404).json({ message: 'No meal data found for the specified user in the given mess, month, and year' });
+        }
+
+        const totalMeals = userMeals.reduce((total, meal) => {
+            return total + meal.breakfast + meal.lunch + meal.dinner;
+        }, 0);
+
+        res.status(200).json({ messId, month, year, userId, totalMeals });
+    } catch (error) {
+        console.error('Error fetching total meal count for user:', error);
         res.status(500).json({ message: error.message });
     }
 };
