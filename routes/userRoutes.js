@@ -16,4 +16,7 @@ router.post('/login', userController.loginUser);
 // Update a user by ID
 router.put('/update/:id', userController.updateUserById);
 
+// chamge password
+router.post('/change-password',userController.changePassword);
+
 module.exports = router;

@@ -111,3 +111,37 @@ exports.updateUserById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+
+exports.changePassword = async (req, res) => {
+    const { userId, oldPassword, newPassword } = req.body;
+
+    try {
+        // Find user by ID
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Validate oldPassword and user.password before bcrypt.compare
+        if (!oldPassword || !user.password) {
+            return res.status(400).json({ message: 'Invalid request parameters' });
+        }
+
+        // Compare oldPassword with hashed password in database
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Incorrect old password' });
+        }
+
+        // Update user password (no need to hash again here)
+        user.password = newPassword;
+        await user.save();
+
+        // Send success response
+        res.status(200).json({ message: 'Password changed successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
