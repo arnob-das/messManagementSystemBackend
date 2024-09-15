@@ -1,4 +1,3 @@
-// controllers/messController.js
 const Mess = require('../models/MessModel');
 const User = require('../models/UserModel');
 
@@ -36,7 +35,6 @@ exports.addMemberToMess = async (req, res) => {
             return res.status(404).json({ message });
         }
 
-        // Check if user is already a member of any mess
         const existingMembership = await Mess.findOne({ members: { $elemMatch: { userId: userId } } });
         if (existingMembership) {
             const message = "User is already a member of another mess";
@@ -55,23 +53,20 @@ exports.addMemberToMess = async (req, res) => {
 
 // find users who are not approved by a mess manager after joining a mess
 exports.getUnapprovedMembers = async (req, res) => {
-    const messId = req.params.messId; // Assuming messId is passed in the request parameters
+    const messId = req.params.messId;
 
     try {
-        // Find the mess by messId and populate the 'members' field to get user details
         const mess = await Mess.findById(messId).populate('members.userId');
 
         if (!mess) {
             return res.status(404).json({ error: 'Mess not found' });
         }
 
-        // Extract member user IDs from the mess document
         const memberIds = mess.members.map(member => member.userId._id);
 
-        // Find users who are members of this mess but not approved
         const unapprovedMembers = await User.find({
-            _id: { $in: memberIds }, // Find users whose IDs are in memberIds array
-            approved: { $ne: true } // Find users where approved is not true
+            _id: { $in: memberIds },
+            approved: { $ne: true }
         });
 
         res.json(unapprovedMembers);
@@ -85,19 +80,15 @@ exports.getUnapprovedMembers = async (req, res) => {
 exports.getApprovedMembers = async (req, res) => {
     const messId = req.params.messId;
     try {
-        // Find the mess by messId and populate the 'members' field to get user details
         const mess = await Mess.findById(messId).populate('members.userId');
 
         if (!mess) {
             return res.status(404).json({ error: 'Mess not found' });
         }
-
-        // Extract member user IDs from the mess document
         const memberIds = mess.members.map(member => member.userId._id);
 
-        // Find users who are members of this mess but not approved
         const approvedMembers = await User.find({
-            _id: { $in: memberIds }, // Find users whose IDs are in memberIds array
+            _id: { $in: memberIds },
             approved: true
         });
 
@@ -112,17 +103,14 @@ exports.getApprovedMembersSeatRents = async (req, res) => {
     const messId = req.params.messId;
 
     try {
-        // Find the mess by messId and populate the 'members.userId' field
         const mess = await Mess.findById(messId).populate('members.userId');
 
         if (!mess) {
             return res.status(404).json({ error: 'Mess not found' });
         }
 
-        // Filter members who are approved
         const approvedMembers = mess.members.filter(member => member.userId.approved);
 
-        // Map to get full name and seat rent
         const approvedMembersSeatRents = approvedMembers.map(member => ({
             fullName: member.userId.fullName,
             seatRent: member.seatRent,
@@ -229,19 +217,16 @@ exports.updateUserRole = async (req, res) => {
     const { messId, userId, role } = req.body;
 
     try {
-        // Find the mess
         const mess = await Mess.findById(messId);
         if (!mess) {
             return res.status(404).json({ message: "Mess not found" });
         }
 
-        // Find the user in the mess members
         const member = mess.members.find(member => member.userId.toString() === userId);
         if (!member) {
             return res.status(404).json({ message: "User is not a member of this mess" });
         }
 
-        // Update the user's role
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -256,31 +241,84 @@ exports.updateUserRole = async (req, res) => {
     }
 };
 
+// exports.leaveMess = async (req, res) => {
+//     try {
+//         const { messId, userId } = req.body;
+
+//         // Find the mess by ID and remove the user from the members array
+//         const mess = await Mess.findById(messId);
+//         if (!mess) {
+//             return res.status(404).json({ message: "Mess not found" });
+//         }
+
+//         // Remove the member from the mess
+//         mess.members = mess.members.filter(member => member.userId.toString() !== userId);
+//         await mess.save();
+
+//         // Update the user's document
+//         const user = await User.findById(userId);
+//         if (!user) {
+//             return res.status(404).json({ message: "User not found" });
+//         }
+//         user.approved = false;
+//         user.role = 'user';
+//         user.currentMessId = null;
+//         await user.save();
+
+//         res.status(200).json({ message: "User has left the mess successfully" });
+//     } catch (error) {
+//         console.error('Error while leaving the mess:', error);
+//         res.status(500).json({ message: "Internal server error" });
+//     }
+// };
+
 exports.leaveMess = async (req, res) => {
     try {
         const { messId, userId } = req.body;
 
-        // Find the mess by ID and remove the user from the members array
         const mess = await Mess.findById(messId);
         if (!mess) {
             return res.status(404).json({ message: "Mess not found" });
         }
 
-        // Remove the member from the mess
-        mess.members = mess.members.filter(member => member.userId.toString() !== userId);
-        await mess.save();
-
-        // Update the user's document
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        user.approved = false;
-        user.role = 'user';
-        user.currentMessId = null;
-        await user.save();
 
-        res.status(200).json({ message: "User has left the mess successfully" });
+        const isManager = user.role === 'manager';
+        const totalMembers = mess.members.length;
+        const managers = mess.members.filter(member => member.role === 'manager');
+
+        if (totalMembers === 1 && isManager) {
+            mess.members = mess.members.filter(member => member.userId.toString() !== userId);
+            await mess.save();
+
+            user.approved = false;
+            user.role = 'user';
+            user.currentMessId = null;
+            await user.save();
+
+            return res.status(200).json({ message: "User has left the mess successfully" });
+        }
+
+        if (totalMembers > 1 && managers.length === 1 && isManager) {
+            return res.status(400).json({ message: "Please appoint another manager before leaving." });
+        }
+
+        if (isManager && managers.length > 1 || !isManager) {
+            mess.members = mess.members.filter(member => member.userId.toString() !== userId);
+            await mess.save();
+
+            user.approved = false;
+            user.role = 'user';
+            user.currentMessId = null;
+            await user.save();
+
+            return res.status(200).json({ message: "User has left the mess successfully" });
+        }
+
+        res.status(400).json({ message: "Unable to leave the mess due to unknown condition" });
     } catch (error) {
         console.error('Error while leaving the mess:', error);
         res.status(500).json({ message: "Internal server error" });

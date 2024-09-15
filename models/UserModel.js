@@ -9,12 +9,10 @@ const UserSchema = new mongoose.Schema({
     nationalId: { type: String, required: true, unique: true },
     role: { type: String, default: 'user' },
     approved: { type: Boolean, default: null },
-    //currentMessId: { type: mongoose.Schema.Types.ObjectId, default: null },
     currentMessId: { type: mongoose.Schema.Types.ObjectId, ref: 'Mess', default: null }
 
 });
 
-// Pre-save hook to hash password
 UserSchema.pre('save', async function (next) {
     const user = this;
     if (!user.isModified('password')) return next();

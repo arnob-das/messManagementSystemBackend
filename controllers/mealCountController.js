@@ -75,7 +75,6 @@ exports.getAllMessMembersMeals = async (req, res) => {
             return res.status(404).json({ message: 'No meal data found for the specified mess, month, and year' });
         }
 
-        // Group meals by userId
         const mealsByUser = mealCounts.meals.reduce((acc, meal) => {
             if (!acc[meal.userId]) {
                 acc[meal.userId] = [];
@@ -84,7 +83,6 @@ exports.getAllMessMembersMeals = async (req, res) => {
             return acc;
         }, {});
 
-        // Fetch user details and add userFullName
         const groupedMeals = await Promise.all(Object.keys(mealsByUser).map(async userId => {
             const user = await UserModel.findById(userId);
             return {

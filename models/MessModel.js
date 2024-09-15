@@ -1,4 +1,3 @@
-// models/messModel.js
 const mongoose = require('mongoose');
 
 const messSchema = new mongoose.Schema({
