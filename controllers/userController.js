@@ -100,7 +100,6 @@ exports.loginUser = async (req, res) => {
 // user become a manager
 exports.updateUserById = async (req, res) => {
     const { id } = req.params;
-    console.log(id)
     const { approved, currentMessId, role } = req.body;
 
     try {
