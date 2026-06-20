@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const utilityBillController = require('../controllers/utilityBillController');
+const authMiddleware = require('../middlewares/authMiddleware');
+
+router.use(authMiddleware);
 
 // Add a utility
 router.post('/add', utilityBillController.addUtility);

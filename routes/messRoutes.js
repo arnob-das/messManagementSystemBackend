@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const messController = require('../controllers/MessController');
+const authMiddleware = require('../middlewares/authMiddleware');
+
+router.use(authMiddleware);
 
 // Create a mess
 router.post('/create', messController.createMess);

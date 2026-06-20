@@ -35,7 +35,7 @@ exports.registerUser = async (req, res) => {
 // Get all users
 exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find().select('-password');
         res.status(200).json(users);
     } catch (err) {
         console.error(err);
@@ -61,7 +61,7 @@ exports.getUserById = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const user = await User.findById(id);
+        const user = await User.findById(id).select('-password');
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -89,7 +89,16 @@ exports.loginUser = async (req, res) => {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
 
-        res.status(200).json({ user, message: 'Login successful' });
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET || 'secretkey123',
+            { expiresIn: '7d' }
+        );
+
+        const userToSend = user.toObject();
+        delete userToSend.password;
+
+        res.status(200).json({ user: userToSend, token, message: 'Login successful' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error from server' });
@@ -107,7 +116,7 @@ exports.updateUserById = async (req, res) => {
             id,
             { approved, currentMessId, role },
             { new: true }
-        );
+        ).select('-password');
 
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });

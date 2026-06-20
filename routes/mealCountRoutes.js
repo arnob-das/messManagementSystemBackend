@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const mealCountController = require('../controllers/mealCountController')
+const mealCountController = require('../controllers/mealCountController');
+const authMiddleware = require('../middlewares/authMiddleware');
+
+router.use(authMiddleware);
 
 router.post('/addMeal', mealCountController.addMeal);
 router.get('/getMeals',mealCountController.getMeals);   

@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const mealDepositController = require('../controllers/mealDepositController');
+const authMiddleware = require('../middlewares/authMiddleware');
+
+router.use(authMiddleware);
 
 router.post('/addMealDeposit', mealDepositController.addMealDeposit);
 router.put('/updateMealDeposit', mealDepositController.updateMealDeposit);
